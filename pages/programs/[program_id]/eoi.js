@@ -56,10 +56,24 @@ export default function specificEOI() {
         fetcher
     );
 
-    const [insertEOI, { data, loading, error }] = useMutation(
+    const [
+        insertEOI,
+        { data: EOI_data, loading: EOI_loading, error: EOI_error },
+    ] = useMutation(
         gql`
             mutation InsertEOI($nominee_id: ID!, $program_id: ID!) {
                 insertEOI(nominee_id: $nominee_id, program_id: $program_id)
+            }
+        `
+    );
+
+    const [
+        insertNominee,
+        { data: NOM_data, loading: NOM_loading, error: NOM_error },
+    ] = useMutation(
+        gql`
+            mutation InsertNominee($contact_email: String!, $name: String!) {
+                insertNominee(contact_email: $contact_email, name: $name)
             }
         `
     );
@@ -88,7 +102,6 @@ export default function specificEOI() {
             );
             if (n.length > 0) {
                 // This nominee already exists
-                // Execute a raw graphql query to insert a new EOI
                 insertEOI({
                     variables: {
                         nominee_id: n[0].nominee_id,
@@ -99,6 +112,35 @@ export default function specificEOI() {
                         "/programs/" + program_id + "/eoi/?postEOI=failure"
                     );
                 });
+                return 0;
+            } else {
+                // This nominee does not exist
+                insertNominee({
+                    variables: {
+                        contact_email: formData.target.contact_email.value,
+                        name: formData.target.name.value,
+                    },
+                })
+                    .then((e) =>
+                        insertEOI({
+                            variables: {
+                                nominee_id: e.data.insertNominee,
+                                program_id: program_id,
+                            },
+                        }).catch((reason) => {
+                            router.push(
+                                "/programs/" +
+                                    program_id +
+                                    "/eoi/?postEOI=failure"
+                            );
+                        })
+                    )
+                    .catch((reason) => {
+                        router.push(
+                            "/programs/" + program_id + "/eoi/?postNOM=failure"
+                        );
+                    });
+                return 1;
             }
         }
     };
@@ -113,10 +155,15 @@ export default function specificEOI() {
                     className="flex flex-col items-center mt-4"
                     onSubmit={(e) => {
                         e.preventDefault();
-                        handleSubmit(e);
-                        router.push(
-                            "/programs/" + program_id + "?postEOI=success"
-                        );
+                        handleSubmit(e)
+                            ? router.push(
+                                  "/programs/" +
+                                      program_id +
+                                      "?postEOI=success&postNOM=success"
+                              )
+                            : router.push(
+                                  "/programs/" + program_id + "?postEOI=success"
+                              );
                     }}
                 >
                     <div className="relative">
@@ -158,15 +205,15 @@ export default function specificEOI() {
                                 ) : (
                                     <div className="has-tooltip absolute -right-5 top-7">
                                         <FontAwesomeIcon
-                                            className="text-yellow-500"
+                                            className="text-red-500"
                                             icon={faSquareCheck}
                                         />
-                                        <span className="tooltip bg-slate-100 ml-2 w-40 border border-yellow-500 text-neutral-700 rounded-lg p-1 text-xs">
+                                        <span className="tooltip bg-slate-100 ml-2 w-40 border border-red-500 text-neutral-700 rounded-lg p-1 text-xs">
                                             Email found. Invalid name.
                                         </span>
                                     </div>
                                 )
-                            ) : (
+                            ) : enteredName ? (
                                 <div className="has-tooltip absolute -right-5 top-7">
                                     <FontAwesomeIcon
                                         className="text-yellow-500"
@@ -174,18 +221,28 @@ export default function specificEOI() {
                                     />
                                     <span className="tooltip bg-slate-100 ml-2 w-40 border border-yellow-500 text-neutral-700 rounded-lg p-1 text-xs">
                                         Email not found. A new nominee will be
-                                        created.
+                                        created for {enteredName}
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="has-tooltip absolute -right-5 top-7">
+                                    <FontAwesomeIcon
+                                        className="text-red-500"
+                                        icon={faTriangleExclamation}
+                                    />
+                                    <span className="tooltip bg-slate-100 ml-2 w-40 border border-red-500 text-neutral-700 rounded-lg p-1 text-xs">
+                                        Email not found. Invalid name.
                                     </span>
                                 </div>
                             )
                         ) : (
                             <div className="has-tooltip absolute -right-5 top-7">
                                 <FontAwesomeIcon
-                                    className="text-red-600"
+                                    className="text-red-500"
                                     icon={faCircleExclamation}
                                 />
-                                <span className="tooltip bg-slate-100 ml-2 w-40 border border-red-600 text-neutral-700 rounded-lg p-1 text-xs">
-                                    Email address is invalid
+                                <span className="tooltip bg-slate-100 ml-2 w-40 border border-red-500 text-neutral-700 rounded-lg p-1 text-xs">
+                                    Email address is invalid.
                                 </span>
                             </div>
                         )}

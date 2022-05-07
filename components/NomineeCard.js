@@ -92,7 +92,17 @@ export default function NomineeCard({
                                 nominee_id: nominee_id,
                                 program_id: program_id,
                             },
+                        }).catch((reason) => {
+                            router.push(
+                                "/programs/" +
+                                    program_id +
+                                    "?postDEL_EOI=failure"
+                            );
+                            router.reload();
                         });
+                        router.push(
+                            "/programs/" + program_id + "?postDEL_EOI=success"
+                        );
                         router.reload();
                     }}
                 >
