@@ -1,5 +1,6 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import {
+    faCircleExclamation,
     faSquareCheck,
     faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
@@ -9,10 +10,12 @@ import { useState } from "react";
 import useSWR from "swr";
 import Pagetitle from "../../../components/Pagetitle";
 import { fetcher, fetcherWithVar } from "../../../lib/fetcher";
+import validateEmail from "../../../lib/validateEmail";
 
 export default function specificEOI() {
     const router = useRouter();
-    const [enteredEmail, setEnteredEmail] = useState(0);
+    const [enteredEmail, setEnteredEmail] = useState("");
+    const [enteredName, setEnteredName] = useState("");
 
     const { program_id } = router.query;
     const { data: prog_data, error: prog_error } = useSWR(
@@ -100,10 +103,6 @@ export default function specificEOI() {
         }
     };
 
-    const handleEmailChange = (formData) => {
-        setEnteredEmail(formData.target.value);
-    };
-
     return (
         <div className="w-full flex flex-col items-center">
             <Pagetitle>Expression of Interest</Pagetitle>
@@ -125,33 +124,94 @@ export default function specificEOI() {
                             id="contact_email"
                             className="border rounded-md p-1 m-1"
                             placeholder="Contact Email..."
-                            onChange={handleEmailChange}
+                            onChange={(e) => setEnteredEmail(e.target.value)}
                         />
-                        {/* {nominees.some(
-                            (e) => e.contact_email === enteredEmail
-                        ) ? (
-                            <FontAwesomeIcon
-                                className="absolute -right-4 top-3 text-lime-500"
-                                icon={faSquareCheck}
-                            />
+                        {validateEmail(enteredEmail) ? (
+                            nominees.some(
+                                (e) => e.contact_email === enteredEmail
+                            ) ? (
+                                nominees.some(
+                                    (e) =>
+                                        e.contact_email === enteredEmail &&
+                                        e.name === enteredName
+                                ) ? (
+                                    <div className="has-tooltip absolute -right-5 top-7">
+                                        <FontAwesomeIcon
+                                            className="text-cyan-500"
+                                            icon={faSquareCheck}
+                                        />
+                                        <span className="tooltip bg-slate-100 ml-2 w-40 border border-cyan-500 text-neutral-700 rounded-lg p-1 text-xs">
+                                            Nominee found.
+                                        </span>
+                                    </div>
+                                ) : enteredName ? (
+                                    <div className="has-tooltip absolute -right-5 top-7">
+                                        <FontAwesomeIcon
+                                            className="text-lime-500"
+                                            icon={faSquareCheck}
+                                        />
+                                        <span className="tooltip bg-slate-100 ml-2 w-40 border border-lime-500 text-neutral-700 rounded-lg p-1 text-xs">
+                                            Email found. A new nominee will be
+                                            created for {enteredName}.
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <div className="has-tooltip absolute -right-5 top-7">
+                                        <FontAwesomeIcon
+                                            className="text-yellow-500"
+                                            icon={faSquareCheck}
+                                        />
+                                        <span className="tooltip bg-slate-100 ml-2 w-40 border border-yellow-500 text-neutral-700 rounded-lg p-1 text-xs">
+                                            Email found. Invalid name.
+                                        </span>
+                                    </div>
+                                )
+                            ) : (
+                                <div className="has-tooltip absolute -right-5 top-7">
+                                    <FontAwesomeIcon
+                                        className="text-yellow-500"
+                                        icon={faTriangleExclamation}
+                                    />
+                                    <span className="tooltip bg-slate-100 ml-2 w-40 border border-yellow-500 text-neutral-700 rounded-lg p-1 text-xs">
+                                        Email not found. A new nominee will be
+                                        created.
+                                    </span>
+                                </div>
+                            )
                         ) : (
-                            <FontAwesomeIcon
-                                className="absolute -right-4 top-3 text-yellow-500"
-                                icon={faTriangleExclamation}
-                            />
-                        )} */}
+                            <div className="has-tooltip absolute -right-5 top-7">
+                                <FontAwesomeIcon
+                                    className="text-red-600"
+                                    icon={faCircleExclamation}
+                                />
+                                <span className="tooltip bg-slate-100 ml-2 w-40 border border-red-600 text-neutral-700 rounded-lg p-1 text-xs">
+                                    Email address is invalid
+                                </span>
+                            </div>
+                        )}
                     </div>
                     <input
                         id="name"
                         className="border rounded-md p-1 m-1"
                         placeholder="Nominee Name..."
+                        onChange={(e) => setEnteredName(e.target.value)}
                     />
-                    <button
-                        type="submit"
-                        className="border px-10 text-lg m-1 hover:bg-slate-50 rounded-md"
-                    >
-                        Submit
-                    </button>
+                    {validateEmail(enteredEmail) && enteredName ? (
+                        <button
+                            type="submit"
+                            className="border px-10 text-lg m-1 disabled:text-neutral-400 shadow-sm disabled:shadow-inner hover:bg-slate-50 disabled:hover:bg-inherit rounded-md"
+                        >
+                            Submit
+                        </button>
+                    ) : (
+                        <button
+                            disabled
+                            type="submit"
+                            className="border px-10 text-lg m-1 disabled:text-neutral-400 shadow-sm disabled:shadow-inner hover:bg-slate-50 disabled:hover:bg-inherit rounded-md"
+                        >
+                            Submit
+                        </button>
+                    )}
                 </form>
             </div>
         </div>
