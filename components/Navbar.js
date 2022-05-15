@@ -8,9 +8,7 @@ export default function Navbar() {
             className="flex flex-row bg-cyan-600 w-full h-10 items-center"
         >
             <NavItem href="/dashboard">Dashboard</NavItem>
-            <NavItem href="/dashboard">Nominee Lookup</NavItem>
-            <NavItem href="/dashboard">Program Lookup</NavItem>
-            <NavItem href="/dashboard">Register Interest</NavItem>
+            <NavItem href="/nominees">Nominee Lookup</NavItem>
         </div>
     );
 }

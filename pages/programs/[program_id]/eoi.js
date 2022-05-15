@@ -5,6 +5,7 @@ import {
     faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import useSWR from "swr";
@@ -146,131 +147,142 @@ export default function specificEOI() {
     };
 
     return (
-        <div className="w-full flex flex-col items-center">
-            <Pagetitle>Expression of Interest</Pagetitle>
-            <div className="w-7/12 flex flex-col items-center justify-start my-4 p-3 rounded-md border-4 border-dashed">
-                <div className="text-3xl font-semibold">{program_name}</div>
-                <div className="text-xl font-thin">Expression of Interest</div>
-                <form
-                    className="flex flex-col items-center mt-4"
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        handleSubmit(e)
-                            ? router.push(
-                                  "/programs/" +
-                                      program_id +
-                                      "?postEOI=success&postNOM=success"
-                              )
-                            : router.push(
-                                  "/programs/" + program_id + "?postEOI=success"
-                              );
-                    }}
-                >
-                    <div className="relative">
-                        <input
-                            id="contact_email"
-                            className="border rounded-md p-1 m-1"
-                            placeholder="Contact Email..."
-                            onChange={(e) => setEnteredEmail(e.target.value)}
-                        />
-                        {validateEmail(enteredEmail) ? (
-                            nominees.some(
-                                (e) => e.contact_email === enteredEmail
-                            ) ? (
+        <>
+            <Head>
+                <title>Expression of Interest | {program_name}</title>
+            </Head>
+            <div className="w-full flex flex-col items-center">
+                <Pagetitle>Expression of Interest</Pagetitle>
+                <div className="w-7/12 flex flex-col items-center justify-start my-4 p-3 rounded-md border-4 border-dashed">
+                    <div className="text-3xl font-semibold">{program_name}</div>
+                    <div className="text-xl font-thin">
+                        Expression of Interest
+                    </div>
+                    <form
+                        className="flex flex-col items-center mt-4 w-1/3"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSubmit(e)
+                                ? router.push(
+                                      "/programs/" +
+                                          program_id +
+                                          "?postEOI=success&postNOM=success"
+                                  )
+                                : router.push(
+                                      "/programs/" +
+                                          program_id +
+                                          "?postEOI=success"
+                                  );
+                        }}
+                    >
+                        <div className="relative w-full">
+                            <input
+                                id="contact_email"
+                                className="border rounded-md p-1 m-1 w-full"
+                                placeholder="Contact Email..."
+                                onChange={(e) =>
+                                    setEnteredEmail(e.target.value)
+                                }
+                            />
+                            {validateEmail(enteredEmail) ? (
                                 nominees.some(
-                                    (e) =>
-                                        e.contact_email === enteredEmail &&
-                                        e.name === enteredName
+                                    (e) => e.contact_email === enteredEmail
                                 ) ? (
-                                    <div className="has-tooltip absolute -right-5 top-7">
-                                        <FontAwesomeIcon
-                                            className="text-cyan-500"
-                                            icon={faSquareCheck}
-                                        />
-                                        <span className="tooltip bg-slate-100 ml-2 w-40 border border-cyan-500 text-neutral-700 rounded-lg p-1 text-xs">
-                                            Nominee found.
-                                        </span>
-                                    </div>
+                                    nominees.some(
+                                        (e) =>
+                                            e.contact_email === enteredEmail &&
+                                            e.name === enteredName
+                                    ) ? (
+                                        <div className="has-tooltip absolute -right-5 top-7">
+                                            <FontAwesomeIcon
+                                                className="text-cyan-500"
+                                                icon={faSquareCheck}
+                                            />
+                                            <span className="tooltip bg-slate-100 ml-2 w-40 border border-cyan-500 text-neutral-700 rounded-lg p-1 text-xs">
+                                                Nominee found.
+                                            </span>
+                                        </div>
+                                    ) : enteredName ? (
+                                        <div className="has-tooltip absolute -right-5 top-7">
+                                            <FontAwesomeIcon
+                                                className="text-lime-500"
+                                                icon={faSquareCheck}
+                                            />
+                                            <span className="tooltip bg-slate-100 ml-2 w-40 border border-lime-500 text-neutral-700 rounded-lg p-1 text-xs">
+                                                Email found. A new nominee will
+                                                be created for {enteredName}.
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <div className="has-tooltip absolute -right-5 top-7">
+                                            <FontAwesomeIcon
+                                                className="text-red-500"
+                                                icon={faSquareCheck}
+                                            />
+                                            <span className="tooltip bg-slate-100 ml-2 w-40 border border-red-500 text-neutral-700 rounded-lg p-1 text-xs">
+                                                Email found. Invalid name.
+                                            </span>
+                                        </div>
+                                    )
                                 ) : enteredName ? (
                                     <div className="has-tooltip absolute -right-5 top-7">
                                         <FontAwesomeIcon
-                                            className="text-lime-500"
-                                            icon={faSquareCheck}
+                                            className="text-yellow-500"
+                                            icon={faTriangleExclamation}
                                         />
-                                        <span className="tooltip bg-slate-100 ml-2 w-40 border border-lime-500 text-neutral-700 rounded-lg p-1 text-xs">
-                                            Email found. A new nominee will be
-                                            created for {enteredName}.
+                                        <span className="tooltip bg-slate-100 ml-2 w-40 border border-yellow-500 text-neutral-700 rounded-lg p-1 text-xs">
+                                            Email not found. A new nominee will
+                                            be created for {enteredName}
                                         </span>
                                     </div>
                                 ) : (
                                     <div className="has-tooltip absolute -right-5 top-7">
                                         <FontAwesomeIcon
                                             className="text-red-500"
-                                            icon={faSquareCheck}
+                                            icon={faTriangleExclamation}
                                         />
                                         <span className="tooltip bg-slate-100 ml-2 w-40 border border-red-500 text-neutral-700 rounded-lg p-1 text-xs">
-                                            Email found. Invalid name.
+                                            Email not found. Invalid name.
                                         </span>
                                     </div>
                                 )
-                            ) : enteredName ? (
-                                <div className="has-tooltip absolute -right-5 top-7">
-                                    <FontAwesomeIcon
-                                        className="text-yellow-500"
-                                        icon={faTriangleExclamation}
-                                    />
-                                    <span className="tooltip bg-slate-100 ml-2 w-40 border border-yellow-500 text-neutral-700 rounded-lg p-1 text-xs">
-                                        Email not found. A new nominee will be
-                                        created for {enteredName}
-                                    </span>
-                                </div>
                             ) : (
                                 <div className="has-tooltip absolute -right-5 top-7">
                                     <FontAwesomeIcon
                                         className="text-red-500"
-                                        icon={faTriangleExclamation}
+                                        icon={faCircleExclamation}
                                     />
                                     <span className="tooltip bg-slate-100 ml-2 w-40 border border-red-500 text-neutral-700 rounded-lg p-1 text-xs">
-                                        Email not found. Invalid name.
+                                        Email address is invalid.
                                     </span>
                                 </div>
-                            )
+                            )}
+                        </div>
+                        <input
+                            id="name"
+                            className="border rounded-md p-1 m-1"
+                            placeholder="Nominee Name..."
+                            onChange={(e) => setEnteredName(e.target.value)}
+                        />
+                        {validateEmail(enteredEmail) && enteredName ? (
+                            <button
+                                type="submit"
+                                className="border px-10 text-lg m-1 disabled:text-neutral-400 shadow-sm disabled:shadow-inner hover:bg-slate-50 disabled:hover:bg-inherit rounded-md"
+                            >
+                                Submit
+                            </button>
                         ) : (
-                            <div className="has-tooltip absolute -right-5 top-7">
-                                <FontAwesomeIcon
-                                    className="text-red-500"
-                                    icon={faCircleExclamation}
-                                />
-                                <span className="tooltip bg-slate-100 ml-2 w-40 border border-red-500 text-neutral-700 rounded-lg p-1 text-xs">
-                                    Email address is invalid.
-                                </span>
-                            </div>
+                            <button
+                                disabled
+                                type="submit"
+                                className="border px-10 text-lg m-1 disabled:text-neutral-400 shadow-sm disabled:shadow-inner hover:bg-slate-50 disabled:hover:bg-inherit rounded-md"
+                            >
+                                Submit
+                            </button>
                         )}
-                    </div>
-                    <input
-                        id="name"
-                        className="border rounded-md p-1 m-1"
-                        placeholder="Nominee Name..."
-                        onChange={(e) => setEnteredName(e.target.value)}
-                    />
-                    {validateEmail(enteredEmail) && enteredName ? (
-                        <button
-                            type="submit"
-                            className="border px-10 text-lg m-1 disabled:text-neutral-400 shadow-sm disabled:shadow-inner hover:bg-slate-50 disabled:hover:bg-inherit rounded-md"
-                        >
-                            Submit
-                        </button>
-                    ) : (
-                        <button
-                            disabled
-                            type="submit"
-                            className="border px-10 text-lg m-1 disabled:text-neutral-400 shadow-sm disabled:shadow-inner hover:bg-slate-50 disabled:hover:bg-inherit rounded-md"
-                        >
-                            Submit
-                        </button>
-                    )}
-                </form>
+                    </form>
+                </div>
             </div>
-        </div>
+        </>
     );
 }

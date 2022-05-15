@@ -1,3 +1,4 @@
+import Head from "next/head";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import Loading from "../../components/Loading";
@@ -38,30 +39,18 @@ export default function programDetails() {
     var program_info;
     if (prog_error)
         return <div>Error loading program with ID: {program_id}</div>;
-    if (!prog_data)
-        program_info = {
-            program_id: <Loading />,
-            program_name: <Loading />,
-            year_levels: <Loading />,
-            event_type: <Loading />,
-            term: <Loading />,
-            cost: <Loading />,
-            location: <Loading />,
-            pre_requisite: <Loading />,
-            faculty_name: <Loading />,
-            hod_email: <Loading />,
-            hod_name: <Loading />,
-            tic_emails: <Loading />,
-            tic_names: <Loading />,
-            details: <Loading />,
-            consolidating_features: <Loading />,
-        };
+    if (!prog_data) return <div>Loading...</div>;
     else program_info = prog_data.getProgramByID;
 
     return (
-        <div className="flex flex-col items-center">
-            <Pagetitle>{program_info.program_name}</Pagetitle>
-            <ProgramDetails program_info={program_info} />
-        </div>
+        <>
+            <Head>
+                <title>{program_info.program_name} | Program Details</title>
+            </Head>
+            <div className="flex flex-col items-center">
+                <Pagetitle>{program_info.program_name}</Pagetitle>
+                <ProgramDetails program_info={program_info} />
+            </div>
+        </>
     );
 }

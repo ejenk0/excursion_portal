@@ -84,36 +84,42 @@ export default function NomineeCard({
                         </a>
                     </Link>
                 </div>
-                <form
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        deleteEOI({
-                            variables: {
-                                nominee_id: nominee_id,
-                                program_id: program_id,
-                            },
-                        }).catch((reason) => {
+                {program_id ? (
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            deleteEOI({
+                                variables: {
+                                    nominee_id: nominee_id,
+                                    program_id: program_id,
+                                },
+                            }).catch((reason) => {
+                                router.push(
+                                    "/programs/" +
+                                        program_id +
+                                        "?postDEL_EOI=failure"
+                                );
+                                router.reload();
+                            });
                             router.push(
                                 "/programs/" +
                                     program_id +
-                                    "?postDEL_EOI=failure"
+                                    "?postDEL_EOI=success"
                             );
                             router.reload();
-                        });
-                        router.push(
-                            "/programs/" + program_id + "?postDEL_EOI=success"
-                        );
-                        router.reload();
-                    }}
-                >
-                    <div className="mt-3 hover:text-red-600">
-                        <button type="submit">
-                            <a>
-                                <FontAwesomeIcon icon={faTrashCan} />
-                            </a>
-                        </button>
-                    </div>
-                </form>
+                        }}
+                    >
+                        <div className="mt-3 hover:text-red-600">
+                            <button type="submit">
+                                <a>
+                                    <FontAwesomeIcon icon={faTrashCan} />
+                                </a>
+                            </button>
+                        </div>
+                    </form>
+                ) : (
+                    ""
+                )}
             </div>
         </div>
     );
